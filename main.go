@@ -249,4 +249,14 @@ func main() {
 
 	str2 := "Hello, world!"
 	fmt.Println(ReverseString(&str2))
+
+	const (
+    Monday    = "Понедельник"
+    Tuesday   = "Вторник"
+    Wednesday = "Среда"
+    Thursday  = "Четверг"
+    Friday    = "Пятница"
+    Saturday  = "Суббота"
+    Sunday    = "Воскресенье"
+)
 }

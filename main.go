@@ -251,12 +251,22 @@ func main() {
 	fmt.Println(ReverseString(&str2))
 
 	const (
-    Monday    = "Понедельник"
-    Tuesday   = "Вторник"
-    Wednesday = "Среда"
-    Thursday  = "Четверг"
-    Friday    = "Пятница"
-    Saturday  = "Суббота"
-    Sunday    = "Воскресенье"
-)
+		Monday    = "Понедельник"
+		Tuesday   = "Вторник"
+		Wednesday = "Среда"
+		Thursday  = "Четверг"
+		Friday    = "Пятница"
+		Saturday  = "Суббота"
+		Sunday    = "Воскресенье"
+	)
+
+	const (
+		Monday1    int = 1
+		Tuesday2   int = 2
+		Wednesday3 int = 3
+		Thursday4  int = 4
+		Friday5    int = 5
+		Saturday6  int = 6
+		Sunday7    int = 7
+	)
 }

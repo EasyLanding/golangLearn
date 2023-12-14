@@ -1,0 +1,8 @@
+github.com/corpix/uarand v0.0.0-20170723150923-031be390f409 h1:9A+mfQmwzZ6KwUXPc8nHxFtKgn9VIvO3gXAOspIcE3s=
+github.com/corpix/uarand v0.0.0-20170723150923-031be390f409/go.mod h1:JSm890tOkDN+M1jqN8pUGDKnzJrsVbJwSMHBY4zwz7M=
+github.com/icrowley/fake v0.0.0-20221112152111-d7b7e2276db2 h1:qU3v73XG4QAqCPHA4HOpfC1EfUvtLIDvQK4mNQ0LvgI=
+github.com/icrowley/fake v0.0.0-20221112152111-d7b7e2276db2/go.mod h1:dQ6TM/OGAe+cMws81eTe4Btv1dKxfPZ2CX+YaAFAPN4=
+github.com/mewzax/gocolors v0.0.0-20221019142406-54bd99dc8314 h1:4lImD5fx+IU6e1ZOiZwU2WmhriS93Ke4TTWctF2YPAc=
+github.com/mewzax/gocolors v0.0.0-20221019142406-54bd99dc8314/go.mod h1:QSmM8cwZKcFbg6YJ6CJclkC6E2oDqT33gMfRMY4vBbY=
+github.com/shopspring/decimal v1.3.1 h1:2Usl1nmF/WZucqkFZhnfFYxxxu8LG21F6nPQBE5gKV8=
+github.com/shopspring/decimal v1.3.1/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=

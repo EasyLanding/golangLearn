@@ -176,6 +176,25 @@ func ReverseString(str *string) string {
 	return string(s)
 }
 
+func WriteInfo() {
+	var name string
+	var age int
+	var city string
+
+	fmt.Print("Введите ваше имя: ")
+	fmt.Scanln(&name)
+
+	fmt.Print("Введите ваш возраст: ")
+	fmt.Scanln(&age)
+
+	fmt.Print("Введите ваш город: ")
+	fmt.Scanln(&city)
+
+	fmt.Println("Имя:", name)
+	fmt.Println("Возраст:", age)
+	fmt.Println("Город:", city)
+}
+
 func main() {
 	fmt.Println(HelloWorld())
 	fmt.Println(SecondString())
@@ -286,4 +305,6 @@ func main() {
 		id13
 	)
 	fmt.Println(id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, id12, id13)
+
+	WriteInfo()
 }

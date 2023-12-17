@@ -8,4 +8,9 @@ require (
 	github.com/shopspring/decimal v1.3.1
 )
 
-require github.com/corpix/uarand v0.0.0-20170723150923-031be390f409 // indirect
+require github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
+
+require (
+	github.com/corpix/uarand v0.0.0-20170723150923-031be390f409 // indirect
+	github.com/mattevans/dinero v0.8.0
+)

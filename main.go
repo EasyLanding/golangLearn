@@ -1,11 +1,16 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
+	"strconv"
 	"strings"
+	"time"
+	"unsafe"
 
 	"github.com/icrowley/fake"
+	"github.com/mattevans/dinero"
 	"github.com/mewzax/gocolors"
 	"github.com/shopspring/decimal"
 )
@@ -195,6 +200,212 @@ func WriteInfo() {
 	fmt.Println("Город:", city)
 }
 
+func calculate(a, b float64, operation string) (float64, error) {
+	var result float64
+	var err error
+
+	switch operation {
+	case "difference":
+		result = a - b
+	case "sum":
+		result = a + b
+	case "product":
+		result = a * b
+	case "quotient":
+		if b == 0 {
+			err = errors.New("division by zero")
+		}
+	default:
+		err = errors.New("unknown operation")
+	}
+
+	return result, err
+}
+
+func hypotenuse(a, b *float64) float64 {
+	return math.Sqrt(*a**a + *b**b)
+}
+
+func currencyPairRate(from string, to string, amount float64) (float64, error) {
+	client := dinero.NewClient(
+		"827dec1f583440849866926eb3f16106",
+		from,
+		20*time.Minute,
+	)
+	rate, err := client.Rates.Get(to)
+	if err != nil {
+		return 0, err
+	}
+	return amount * (*rate), nil
+}
+
+func CompareRoundedValues(a, b float64, decimalPlaces int) (isEqual bool, difference float64) {
+	roundFactor := math.Pow(10, float64(decimalPlaces))
+	aRounded := math.Round(a*roundFactor) / roundFactor
+	bRounded := math.Round(b*roundFactor) / roundFactor
+	isEqual = aRounded == bRounded
+	difference = math.Abs(aRounded - bRounded)
+	return isEqual, difference
+}
+
+func binaryStringToFloat(binary string) float32 {
+	var number uint32
+	// Преобразование строки в двоичной системе в целочисленное представление
+	for _, digit := range binary {
+		number <<= 1
+		if digit == '1' {
+			number |= 1
+		}
+	}
+	// Преобразование целочисленного представления в число с плавающей точкой
+	floatNumber := *(*float32)(unsafe.Pointer(&number))
+	return floatNumber
+}
+
+func sizeOf(v interface{}) (int, error) {
+	switch v.(type) {
+	case bool:
+		return int(unsafe.Sizeof(v.(bool))), nil
+	case int:
+		return int(unsafe.Sizeof(v.(int))), nil
+	case int8:
+		return int(unsafe.Sizeof(v.(int8))), nil
+	case int16:
+		return int(unsafe.Sizeof(v.(int16))), nil
+	case int32:
+		return int(unsafe.Sizeof(v.(int32))), nil
+	case int64:
+		return int(unsafe.Sizeof(v.(int64))), nil
+	case uint:
+		return int(unsafe.Sizeof(v.(uint))), nil
+	case uint8:
+		return int(unsafe.Sizeof(v.(uint8))), nil
+	default:
+		return 0, errors.New("type is not valid")
+	}
+}
+
+func UserInfo(name, city, phone string, age, weight int) string {
+	return fmt.Sprintf("Имя: %s, Город: %s, Телефон: %s, Возраст: %d, Вес: %d", name, city, phone, age, weight)
+}
+
+func UserInfoMainCityes(name string, age int, cities ...string) string {
+	result := "Имя: " + name + ", возраст: " + strconv.Itoa(age) + ", города: "
+	for i, city := range cities {
+		if i == len(cities)-1 {
+			result += city
+		} else {
+			result += city + ", "
+		}
+	}
+
+	return result
+}
+
+func ConcatenateStrings(sep string, str ...string) string {
+	even := ""
+	odd := ""
+	for i, s := range str {
+		if i != 0 {
+			even += s + sep
+		} else {
+			odd += s + sep
+		}
+	}
+	even = strings.TrimSuffix(even, sep)
+	odd = strings.TrimSuffix(odd, sep)
+	return fmt.Sprintf("even: %s, odd: %s,", even, odd)
+}
+
+func CalculatePercentageChange(initialValue, finalValue string) (float64, error) {
+	initial, err := strconv.ParseFloat(initialValue, 64)
+	if err != nil {
+		return 0, errors.New("initial value is not a number")
+	}
+
+	final, err := strconv.ParseFloat(finalValue, 64)
+	if err != nil {
+		return 0, errors.New("final value is not a number")
+	}
+
+	if initial == 0 {
+		return 0, errors.New("initial value cannot be zero")
+	}
+
+	percentageChange := (final - initial) / initial * 100
+
+	if math.IsInf(percentageChange, 1) || math.IsInf(percentageChange, -1) {
+		return 0, errors.New("division by zero")
+	}
+
+	return percentageChange, nil
+}
+
+func SumAn(a ...int) int {
+	sum := 0
+	for _, num := range a {
+		sum += num
+	}
+	return sum
+}
+
+func MulAn(a ...int) int {
+	mul := 1
+	for _, num := range a {
+		mul *= num
+	}
+	return mul
+}
+
+func SubAn(a ...int) int {
+	sub := a[0]
+	for i := 1; i < len(a); i++ {
+		sub -= a[i]
+	}
+	return sub
+}
+
+func MathOperate(op func(a ...int) int, a ...int) int {
+	return op(a...)
+}
+
+func Factorial(n int) int {
+	if n == 0 {
+		return 1
+	}
+	return n * Factorial(n-1)
+}
+
+func Fibonacci(n int) int {
+	if n == 0 {
+		return 0
+	} else if n == 1 {
+		return 1
+	} else {
+		return Fibonacci(n-1) + Fibonacci(n-2)
+	}
+}
+
+func createCounter() func() int {
+	count := 0
+	return func() int {
+		count++
+		return count
+	}
+}
+
+func multiplier(factor float64) func(float64) float64 {
+	return func(num float64) float64 {
+		return num * factor
+	}
+}
+
+func adder(initial int) func(int) int {
+	return func(num int) int {
+		return num + initial
+	}
+}
+
 func main() {
 	fmt.Println(HelloWorld())
 	fmt.Println(SecondString())
@@ -306,5 +517,92 @@ func main() {
 	)
 	fmt.Println(id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, id12, id13)
 
-	WriteInfo()
+	//WriteInfo()
+
+	a := 10.0
+	b := 5.0
+
+	difference, err := calculate(a, b, "difference")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Difference:", difference)
+	}
+
+	sum, err := calculate(a, b, "sum")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Sum:", sum)
+	}
+
+	product, err := calculate(a, b, "product")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Product:", product)
+	}
+
+	quotient, err := calculate(a, b, "quotient")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Quotient:", quotient)
+	}
+
+	aHypotenuse := 3.0
+	bHypotenuse := 4.0
+	resultHypotenuse := hypotenuse(&aHypotenuse, &bHypotenuse)
+	fmt.Println(resultHypotenuse)
+
+	// rate, err := currencyPairRate("USD", "EUR", 100.0)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Println(rate) // 82.73
+
+	isEqual, difference := CompareRoundedValues(1.23456789, 1.13456788, 8)
+	fmt.Println(isEqual, difference)
+
+	binaryStr := "00111110001000000000000000000000"
+	resultBinary := binaryStringToFloat(binaryStr)
+	fmt.Println(resultBinary) // Выведет: 0.15625
+
+	resultUserInfo := UserInfo("Jane", "Los Angeles", "987-654-3210", 25, 150)
+	fmt.Println(resultUserInfo)
+
+	resultUserInfoMainCity := UserInfoMainCityes("Alex", 34)
+	fmt.Println(resultUserInfoMainCity)
+
+	resultConcatStrings := ConcatenateStrings(":", "somes strings some strings")
+	fmt.Println(resultConcatStrings)
+
+	change, err := CalculatePercentageChange("8", "10")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(change)
+	}
+
+	fmt.Println(MathOperate(SumAn, 1, 1, 3))
+	fmt.Println(MathOperate(MulAn, 1, 7, 3))
+	fmt.Println(MathOperate(SubAn, 13, 2, 3))
+
+	fmt.Println(Factorial(10))
+
+	fmt.Println(Fibonacci(6))
+
+	counter := createCounter()
+	fmt.Println(counter()) // 1
+	fmt.Println(counter()) // 2
+	fmt.Println(counter()) // 3
+
+	m := multiplier(2.5)
+	resultMulty := m(10)
+	fmt.Println(resultMulty)
+
+	addTwo := adder(2)
+	resultAdder := addTwo(3)
+	fmt.Println(resultAdder)
 }

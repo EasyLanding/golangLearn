@@ -406,6 +406,11 @@ func adder(initial int) func(int) int {
 	}
 }
 
+func fibonacciFormula(n int) int {
+    phi := (1 + math.Sqrt(5)) / 2
+    return int(math.Round(math.Pow(phi, float64(n)) / math.Sqrt(5)))
+}
+
 func main() {
 	fmt.Println(HelloWorld())
 	fmt.Println(SecondString())

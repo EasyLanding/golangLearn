@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"math/rand"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -101,7 +102,204 @@ func TestAverage(t *testing.T) {
 }
 
 func BenchmarkFibonacci(b *testing.B) {
-    for i := 0; i < b.N; i++ {
-        _ = fibonacciFormula(7)
-    }
+	for i := 0; i < b.N; i++ {
+		_ = fibonacciFormula(7)
+	}
+}
+
+func TestSumArray(t *testing.T) {
+	nums := [8]int{1, 2, 3, 4, 5, 6, 7, 8}
+	expected := 36
+	result := sumArray(nums)
+	if result != expected {
+		t.Errorf("sum(%v) = %d; expected %d", nums, result, expected)
+	}
+}
+
+func TestAverageArray(t *testing.T) {
+	nums := [8]int{1, 2, 3, 4, 5, 6, 7, 8}
+	expected := 4.5
+	result := averageArray(nums)
+	if result != expected {
+		t.Errorf("average(%v) = %f; expected %f", nums, result, expected)
+	}
+}
+
+func TestAverageFloatArray(t *testing.T) {
+	floatNums := [8]float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}
+	expected := 4.5
+	result := averageFloatArray(floatNums)
+	if result != expected {
+		t.Errorf("averageFloat(%v) = %f; expected %f", floatNums, result, expected)
+	}
+}
+
+func TestReverseArray(t *testing.T) {
+	nums := [8]int{1, 2, 3, 4, 5, 6, 7, 8}
+	expected := [8]int{8, 7, 6, 5, 4, 3, 2, 1}
+	result := reverseArray(nums)
+	if result != expected {
+		t.Errorf("reverse(%v) = %v; expected %v", nums, result, expected)
+	}
+}
+
+func TestSortDescIntAndFloat(t *testing.T) {
+	numsInt := []int{3, 1, 4, 1, 5, 9, 2, 6}
+	expectedInt := []int{9, 6, 5, 4, 3, 2, 1, 1}
+	sortDesc(numsInt)
+	if !equal(numsInt, expectedInt) {
+		t.Errorf("sortDesc(%v) = %v; expected %v", numsInt, numsInt, expectedInt)
+	}
+
+	numsFloat := []float64{3.3, 1.1, 4.4, 1.1, 5.5, 9.9, 2.2, 6.6}
+	expectedFloat := []float64{9.9, 6.6, 5.5, 4.4, 3.3, 2.2, 1.1, 1.1}
+	sortDesc(numsFloat)
+	if !equal(numsFloat, expectedFloat) {
+		t.Errorf("sortDesc(%v) = %v; expected %v", numsFloat, numsFloat, expectedFloat)
+	}
+}
+
+func TestSortAscIntAndFloat(t *testing.T) {
+	numsInt := []int{3, 1, 4, 1, 5, 9, 2, 6}
+	expectedInt := []int{1, 1, 2, 3, 4, 5, 6, 9}
+	sortAsc(numsInt)
+	if !equal(numsInt, expectedInt) {
+		t.Errorf("sortAsc(%v) = %v; expected %v", numsInt, numsInt, expectedInt)
+	}
+
+	numsFloat := []float64{3.3, 1.1, 4.4, 1.1, 5.5, 9.9, 2.2, 6.6}
+	expectedFloat := []float64{1.1, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 9.9}
+	sortAsc(numsFloat)
+	if !equal(numsFloat, expectedFloat) {
+		t.Errorf("sortDesc(%v) = %v; expected %v", numsFloat, numsFloat, expectedFloat)
+	}
+}
+
+func TestGetSubSlice(t *testing.T) {
+	xs := []int{1, 2, 3, 4, 5}
+	start := 1
+	end := 4
+	expected := []int{2, 3, 4}
+
+	actual := getSubSlice(xs, start, end)
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Expected %v but got %v", expected, actual)
+	}
+}
+
+func TestMaxDifference(t *testing.T) {
+	tests := []struct {
+		numbers  []int
+		expected int
+	}{
+		{[]int{1, 2, 3, 4, 5}, 4},
+		{[]int{5, 4, 3, 2, 1}, 0},
+		{[]int{1, 2, 3, 2, 5}, 4},
+		{[]int{1, 2}, 1},
+		{[]int{2, 1}, 0},
+		{[]int{1}, 0},
+		{[]int{}, 0},
+	}
+
+	for _, test := range tests {
+		result := MaxDifference(test.numbers)
+		if result != test.expected {
+			t.Errorf("MaxDifference(%v) = %d; want %d", test.numbers, result, test.expected)
+		}
+	}
+}
+
+func TestFindSingleNumber(t *testing.T) {
+	numbers := []int{1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 6, 7}
+	expected := 6 ^ 7 // ожидаемый результат - XOR двух уникальных чисел
+	result := findSingleNumber(numbers)
+	if result != expected {
+		t.Errorf("findSingleNumber(%v) = %d; expected %d", numbers, result, expected)
+	}
+}
+
+func TestAppendInt(t *testing.T) {
+	// Тестовые данные
+	xs := []int{1, 2, 3}
+	x := []int{4, 5}
+
+	// Вызываем функцию
+	result := appendInt(xs, x...)
+
+	// Проверяем результат
+	expected := []int{1, 2, 3, 4, 5}
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("appendInt(%v, %v) = %v, ожидалось %v", xs, x, result, expected)
+	}
+
+	// Проверяем, что исходный срез не изменился
+	if !reflect.DeepEqual(xs, []int{1, 2, 3}) {
+		t.Errorf("appendInt(%v, %v) изменил исходный срез", xs, x)
+	}
+}
+
+func TestAppendInt2(t *testing.T) {
+	xs := []int{1, 2, 3}
+	appendInt2(&xs, 4, 5)
+
+	expected := []int{1, 2, 3, 4, 5}
+	if !reflect.DeepEqual(xs, expected) {
+		t.Errorf("Expected %v but got %v", expected, xs)
+	}
+}
+
+func TestCut(t *testing.T) {
+	xs := []int{1, 2, 3, 4, 5}
+
+	// Тестирование получения подмножества среза
+	expected := []int{2, 3, 4}
+	result := Cut(xs, 1, 4)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Cut(%v, %d, %d) = %v; expected %v", xs, 1, 4, result, expected)
+	}
+
+	// Тестирование получения пустого среза при выходе за границы
+	expected = []int{}
+	result = Cut(xs, 2, 2)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Cut(%v, %d, %d) = %v; expected %v", xs, 2, 2, result, expected)
+	}
+
+	// Тестирование получения всего среза
+	expected = []int{1, 2, 3, 4, 5}
+	result = Cut(xs, 0, 5)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Cut(%v, %d, %d) = %v; expected %v", xs, 0, 5, result, expected)
+	}
+}
+
+func equal(a, b interface{}) bool {
+	switch a.(type) {
+	case []int:
+		aa := a.([]int)
+		bb := b.([]int)
+		if len(aa) != len(bb) {
+			return false
+		}
+		for i := range aa {
+			if aa[i] != bb[i] {
+				return false
+			}
+		}
+		return true
+	case []float64:
+		aa := a.([]float64)
+		bb := b.([]float64)
+		if len(aa) != len(bb) {
+			return false
+		}
+		for i := range aa {
+			if aa[i] != bb[i] {
+				return false
+			}
+		}
+		return true
+	}
+	return false
 }

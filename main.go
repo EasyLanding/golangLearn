@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -406,9 +407,110 @@ func adder(initial int) func(int) int {
 	}
 }
 
+//Array learning
+
+func sumArray(xs [8]int) int {
+	total := 0
+	for _, x := range xs {
+		total += x
+	}
+	return total
+}
+
+func averageArray(xs [8]int) float64 {
+	total := sumArray(xs)
+	return float64(total) / float64(len(xs))
+}
+
+func averageFloatArray(xs [8]float64) float64 {
+	total := 0.0
+	for _, x := range xs {
+		total += x
+	}
+	return total / float64(len(xs))
+}
+
+func reverseArray(xs [8]int) [8]int {
+	reversed := [8]int{}
+	for i, j := 0, len(xs)-1; i < len(xs); i, j = i+1, j-1 {
+		reversed[i] = xs[j]
+	}
+	return reversed
+}
+
+func sortDesc(nums interface{}) {
+	switch nums.(type) {
+	case []int:
+		sort.Sort(sort.Reverse(sort.IntSlice(nums.([]int))))
+	case []float64:
+		sort.Sort(sort.Reverse(sort.Float64Slice(nums.([]float64))))
+	}
+}
+
+func sortAsc(nums interface{}) {
+	switch nums.(type) {
+	case []int:
+		sort.Sort(sort.IntSlice(nums.([]int)))
+	case []float64:
+		sort.Sort(sort.Float64Slice(nums.([]float64)))
+	}
+}
+
 func fibonacciFormula(n int) int {
-    phi := (1 + math.Sqrt(5)) / 2
-    return int(math.Round(math.Pow(phi, float64(n)) / math.Sqrt(5)))
+	phi := (1 + math.Sqrt(5)) / 2
+	return int(math.Round(math.Pow(phi, float64(n)) / math.Sqrt(5)))
+}
+
+func getSubSlice(xs []int, start, end int) []int {
+	subslice := xs[start:end]
+	return subslice
+}
+
+func MaxDifference(numbers []int) int {
+	if len(numbers) < 2 {
+		return 0
+	}
+
+	min := numbers[0]
+	maxDiff := 0
+
+	for _, num := range numbers {
+		if num < min {
+			min = num
+		}
+		diff := num - min
+		if diff > maxDiff {
+			maxDiff = diff
+		}
+	}
+
+	return maxDiff
+}
+
+func bitwiseXOR(n, res int) int {
+	return n ^ res
+}
+
+func findSingleNumber(numbers []int) int {
+	res := 0
+	for _, num := range numbers {
+		res = bitwiseXOR(num, res)
+	}
+	return res
+}
+
+func appendInt(xs []int, x ...int) []int {
+	result := append(xs, x...)
+	return result
+}
+
+func appendInt2(xs *[]int, x ...int) {
+	*xs = append(*xs, x...)
+}
+
+func Cut(xs []int, start, end int) []int {
+	result := xs[start:end]
+	return result
 }
 
 func main() {
@@ -610,4 +712,50 @@ func main() {
 	addTwo := adder(2)
 	resultAdder := addTwo(3)
 	fmt.Println(resultAdder)
+
+	nums := [8]int{1, 2, 3, 4, 5, 6, 7, 8}
+	fmt.Println(sumArray(nums))     // Output: 36
+	fmt.Println(averageArray(nums)) // Output: 4.5
+
+	floatNums := [8]float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0}
+	fmt.Println(averageFloatArray(floatNums)) // Output: 4.5
+
+	reversedNums := reverseArray(nums)
+	fmt.Println(reversedNums) // Output: [8 7 6 5 4 3 2 1]
+
+	numsInt := []int{3, 1, 4, 1, 5, 9, 2, 6}
+	fmt.Println("Original numsInt:", numsInt)
+	sortDesc(numsInt)
+	fmt.Println("Sorted numsInt:", numsInt)
+
+	numsFloat := []float64{1.2, 2.3, 3.4, 4.5, 5.6, 6.7, 7.8, 8.9}
+	fmt.Println("Original numsInt:", numsFloat)
+	sortDesc(numsFloat)
+	fmt.Println("Sorted numsInt:", numsFloat)
+
+	numsIntAsc := []int{3, 1, 4, 1, 5, 9, 2, 6}
+	fmt.Println("Original numsInt:", numsIntAsc)
+	sortDesc(numsIntAsc)
+	fmt.Println("Sorted numsInt:", numsIntAsc)
+
+	numsFloatAsc := []float64{1.2, 2.3, 3.4, 4.5, 5.6, 6.7, 7.8, 8.9}
+	fmt.Println("Original numsInt:", numsFloatAsc)
+	sortDesc(numsFloatAsc)
+	fmt.Println("Sorted numsInt:", numsFloatAsc)
+
+	numbersSlice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	subSlice := getSubSlice(numbersSlice, 2, 6)
+	fmt.Println(subSlice)
+
+	numbersUnique := []int{1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 6, 7}
+	singleNumber := findSingleNumber(numbersUnique)
+	fmt.Println(singleNumber)
+
+	numbersAppendSlice := []int{1, 2, 3}
+	resultAppenSlice := appendInt(numbersAppendSlice, 4, 5, 6)
+	fmt.Println(resultAppenSlice)
+
+	xs := []int{1, 2, 3}
+	appendInt2(&xs, 4, 5, 6)
+	fmt.Println(xs)
 }

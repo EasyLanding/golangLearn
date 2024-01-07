@@ -8,8 +8,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 	"unsafe"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/icrowley/fake"
 	"github.com/mattevans/dinero"
 	"github.com/mewzax/gocolors"
@@ -513,6 +515,250 @@ func Cut(xs []int, start, end int) []int {
 	return result
 }
 
+type User struct {
+	Name string
+	Age  int
+}
+
+func getUsers() []User {
+	var users []User
+	for i := 0; i < 10; i++ {
+		user := User{Name: gofakeit.Name(), Age: gofakeit.Number(18, 60)}
+		users = append(users, user)
+	}
+	return users
+}
+
+func preparePrint(users []User) string {
+	var result string
+	for _, user := range users {
+		result += fmt.Sprintf("Имя: %s, Возраст: %d\n", user.Name, user.Age)
+	}
+	return result
+}
+
+type Animal struct {
+	Type string
+	Name string
+	Age  int
+}
+
+func getAnimals() []Animal {
+	var animals []Animal
+	for i := 0; i < 3; i++ {
+		animal := Animal{Type: gofakeit.Animal(), Name: gofakeit.Name(), Age: gofakeit.Number(18, 60)}
+		animals = append(animals, animal)
+	}
+	return animals
+}
+
+func preparePrintAnimals(animals []Animal) string {
+	var result string
+	for _, animal := range animals {
+		result += fmt.Sprintf("Тип:%s, Имя: %s, Возраст: %d\n", animal.Type, animal.Name, animal.Age)
+	}
+	return result
+}
+
+type Dish struct {
+	Name  string
+	Price float64
+}
+
+type Order struct {
+	Dishes []Dish
+	Total  float64
+}
+
+func (order *Order) AddDish(dish Dish) {
+	order.Dishes = append(order.Dishes, dish)
+}
+
+func (order *Order) RemoveDish(dish Dish) {
+	for i, d := range order.Dishes {
+		if d.Name == dish.Name && d.Price == dish.Price {
+			order.Dishes = append(order.Dishes[:i], order.Dishes[i+1:]...)
+			break
+		}
+	}
+}
+
+func (order *Order) CalculateTotal() {
+	var total float64
+	for _, dish := range order.Dishes {
+		total += dish.Price
+	}
+	order.Total = total
+}
+
+func countWordOccurrences(text string) map[string]int {
+	occurrences := make(map[string]int)
+	words := strings.Fields(text) // разбиваем текст на слова
+
+	for _, word := range words {
+		occurrences[word]++ // увеличиваем счетчик для каждого слова
+	}
+
+	return occurrences
+}
+
+func mergeMaps(map1, map2 map[string]int) map[string]int {
+	mergedMap := make(map[string]int)
+
+	for key, value := range map1 {
+		mergedMap[key] = value
+	}
+
+	for key, value := range map2 {
+		mergedMap[key] = value
+	}
+
+	return mergedMap
+}
+
+func createUniqueText(text string) string {
+	uniqueWords := make(map[string]bool)
+	words := strings.Fields(text)
+	var result []string
+
+	for _, word := range words {
+		if !uniqueWords[word] {
+			uniqueWords[word] = true
+			result = append(result, word)
+		}
+	}
+	return strings.Join(result, " ")
+}
+
+func filterSentence(sentence string, filter map[string]bool) string {
+	words := strings.Fields(sentence) // разбиваем предложение на слова
+	result := []string{}              // создаем пустой слайс для хранения отфильтрованных слов
+
+	for _, word := range words {
+		if !filter[word] { // если слово не находится в карте фильтра
+			result = append(result, word) // добавляем его в результат
+		}
+	}
+
+	return strings.Join(result, " ") // объединяем отфильтрованные слова в строку с пробелами
+}
+
+// type Word struct {
+// 	Value string
+// 	Upper bool
+// }
+
+// // splitSentences разделяет текст на предложения
+// func splitSentences(text string) []string {
+// 	// Регулярное выражение для разделения текста на предложения
+// 	re := regexp.MustCompile(`"(?m)(?<=\.|\?|\!)\s"`)
+
+// 	return re.Split(text, -1)
+// }
+
+// // WordsToSentence объединяет слова в предложение
+// func WordsToSentence(words []Word) string {
+// 	sentence := ""
+
+// 	for i, word := range words {
+// 		if i == 0 || word.Upper { // первое слово в предложении или слово с заглавной буквы
+// 			sentence += CheckUpper(word.Value)
+// 		} else {
+// 			sentence += word.Value
+// 		}
+
+// 		if i < len(words)-1 { // добавляем пробелы между словами, кроме последнего
+// 			sentence += " "
+// 		}
+// 	}
+
+// 	return sentence
+// }
+
+// // CheckUpper проверяет, нужно ли добавить заглавную букву к слову
+// func CheckUpper(word string) string {
+// 	if len(word) == 0 {
+// 		return word
+// 	}
+
+// 	firstChar := word[0]
+// 	if firstChar >= 'A' && firstChar <= 'Z' {
+// 		return word
+// 	}
+
+// 	return fmt.Sprintf("%c%s", firstChar-32, word[1:])
+// }
+
+// // filterWords Фильтрует текст, заменяя цензурные и повторяющиеся слова
+// func filterWords(text string, censorMap map[string]string) string {
+// 	sentences := splitSentences(text)
+
+// 	if len(sentences) > 1 { // если предложений больше одного
+// 		for i, sentence := range sentences {
+// 			sentences[i] = filterWords(sentence, censorMap) // обработка каждого предложения рекурсивно
+// 		}
+
+// 		return strings.Join(sentences, " ")
+// 	}
+
+// 	words := strings.Fields(text)
+// 	uniqueWords := make(map[string]Word)
+// 	result := []Word{}
+
+// 	for _, wordStr := range words {
+// 		word := Word{Value: wordStr}
+
+// 		if censorMap[wordStr] != "" { // если слово является цензурным
+// 			word.Value = censorMap[wordStr]
+// 			word.Upper = true
+// 		} else if w, ok := uniqueWords[strings.ToLower(wordStr)]; ok { // если слово уже встречалось
+// 			w.Value = ""
+// 			word = w
+// 		} else { // если слово уникальное
+// 			uniqueWords[strings.ToLower(wordStr)] = word
+// 		}
+
+// 		result = append(result, word)
+// 	}
+
+// 	for i, word := range result { // замена в слайсе слов при помощи карты уникальных слов и их индекса
+// 		if word.Value == "" {
+// 			continue
+// 		}
+
+// 		if w, ok := uniqueWords[strings.ToLower(word.Value)]; ok {
+// 			result[i] = w
+// 		}
+// 	}
+
+// 	return WordsToSentence(result)
+// }
+
+func countBytes(s string) int {
+	return len(s)
+}
+
+func countSymbols(s string) int {
+	return utf8.RuneCountInString(s)
+}
+
+func ReverseStrings(str string) string {
+	runes := []rune(str)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
+}
+
+func getType(i interface{}) string {
+	switch i.(type) {
+	case nil:
+		return "Пустой интерфейс"
+	default:
+		return fmt.Sprintf("Тип: %T", i)
+	}
+}
+
 func main() {
 	fmt.Println(HelloWorld())
 	fmt.Println(SecondString())
@@ -758,4 +1004,56 @@ func main() {
 	xs := []int{1, 2, 3}
 	appendInt2(&xs, 4, 5, 6)
 	fmt.Println(xs)
+
+	usersStruc := getUsers()
+	resultUsersStruc := preparePrint(usersStruc)
+	fmt.Println(resultUsersStruc)
+
+	animalsStruc := getAnimals()
+	resultAnimalsStruc := preparePrintAnimals(animalsStruc)
+	fmt.Println(resultAnimalsStruc)
+
+	order := Order{}
+	dish1 := Dish{Name: "Pizza", Price: 10.99}
+	dish2 := Dish{Name: "Burger", Price: 5.99}
+
+	order.AddDish(dish1)
+	order.AddDish(dish2)
+
+	order.CalculateTotal()
+	fmt.Println("Total:", order.Total)
+
+	order.RemoveDish(dish1)
+
+	order.CalculateTotal()
+	fmt.Println("Total:", order.Total)
+
+	text := "Lorem ipsum dolor sit amet consectetur adipiscing elit ipsum"
+	occurrences := countWordOccurrences(text)
+	for word, count := range occurrences {
+		fmt.Printf("%s: %d\n", word, count)
+	}
+
+	resultCreateUniqueText := createUniqueText("bar bar bar foo foo baz")
+	fmt.Println(resultCreateUniqueText)
+
+	// textUnique := "Lorem ipsum dolor sit amet consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium. Lorem ipsum dolor sit amet consectetur adipiscing elit."
+	// censorMap := map[string]string{"ipsum": "****", "dolor": "****"}
+	// filteredText := filterWords(textUnique, censorMap)
+	// fmt.Println(filteredText)
+
+	messageTest := "Привет, мир!"
+	resultCountByteString := countBytes(messageTest)
+	fmt.Println(resultCountByteString)
+	resultCountSymbolsString := countSymbols(messageTest)
+	fmt.Println(resultCountSymbolsString)
+
+	var i interface{} = 42
+	fmt.Println(getType(i)) // Вывод: "int"
+	var j interface{} = "Hello, World!"
+	fmt.Println(getType(j)) // Вывод: "string"
+	var k interface{} = []int{1, 2, 3}
+	fmt.Println(getType(k)) // Вывод: "[]int"
+	var l interface{} = interface{}(nil)
+	fmt.Println(getType(l))
 }

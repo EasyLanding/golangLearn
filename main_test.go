@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 )
@@ -271,6 +272,264 @@ func TestCut(t *testing.T) {
 	result = Cut(xs, 0, 5)
 	if !reflect.DeepEqual(result, expected) {
 		t.Errorf("Cut(%v, %d, %d) = %v; expected %v", xs, 0, 5, result, expected)
+	}
+}
+
+func TestGetUsers(t *testing.T) {
+	users := getUsers()
+
+	if len(users) != 10 {
+		t.Errorf("Expected 10 users, but got %d", len(users))
+	}
+
+	for _, user := range users {
+		if user.Name == "" {
+			t.Error("User name is empty")
+		}
+		if user.Age < 18 || user.Age > 60 {
+			t.Errorf("User age %d is out of range", user.Age)
+		}
+	}
+}
+
+func TestPreparePrint(t *testing.T) {
+	users := []User{
+		{Name: "John Doe", Age: 25},
+		{Name: "Jane Smith", Age: 35},
+	}
+
+	result := preparePrint(users)
+
+	expected := "Имя: John Doe, Возраст: 25\nИмя: Jane Smith, Возраст: 35\n"
+
+	if strings.Compare(result, expected) != 0 {
+		t.Errorf("Expected:\n%s\nBut got:\n%s", expected, result)
+	}
+}
+
+func TestGetAnimals(t *testing.T) {
+	animals := getAnimals()
+
+	if len(animals) != 3 {
+		t.Errorf("Expected 10 users, but got %d", len(animals))
+	}
+
+	for _, animal := range animals {
+		if animal.Type == "" {
+			t.Error("Animal type is empty")
+		}
+		if animal.Name == "" {
+			t.Error("Animal name is empty")
+		}
+		if animal.Age < 18 || animal.Age > 60 {
+			t.Errorf("User age %d is out of range", animal.Age)
+		}
+	}
+}
+
+func TestPreparePrintAnimals(t *testing.T) {
+	animals := []Animal{
+		{Type: "cat", Name: "Tom", Age: 2},
+		{Type: "dog", Name: "Rex", Age: 5},
+	}
+
+	result := preparePrintAnimals(animals)
+
+	expected := "Тип:cat, Имя: Tom, Возраст: 2\nТип:dog, Имя: Rex, Возраст: 5\n"
+
+	if strings.Compare(result, expected) != 0 {
+		t.Errorf("Expected:\n%s\nBut got:\n%s", expected, result)
+	}
+}
+
+func TestAddDish(t *testing.T) {
+	order := Order{}
+	dish1 := Dish{Name: "Pizza", Price: 10.99}
+	dish2 := Dish{Name: "Burger", Price: 5.99}
+
+	order.AddDish(dish1)
+	if len(order.Dishes) != 1 {
+		t.Errorf("Expected 1 dish, got %d", len(order.Dishes))
+	}
+
+	order.AddDish(dish2)
+	if len(order.Dishes) != 2 {
+		t.Errorf("Expected 2 dishes, got %d", len(order.Dishes))
+	}
+}
+
+func TestRemoveDish(t *testing.T) {
+	order := Order{}
+	dish1 := Dish{Name: "Pizza", Price: 10.99}
+	dish2 := Dish{Name: "Burger", Price: 5.99}
+
+	order.AddDish(dish1)
+	order.AddDish(dish2)
+
+	order.RemoveDish(dish1)
+	if len(order.Dishes) != 1 {
+		t.Errorf("Expected 1 dish, got %d", len(order.Dishes))
+	}
+
+	order.RemoveDish(dish2)
+	if len(order.Dishes) != 0 {
+		t.Errorf("Expected 0 dishes, got %d", len(order.Dishes))
+	}
+}
+
+func TestCalculateTotal(t *testing.T) {
+	order := Order{}
+	dish1 := Dish{Name: "Pizza", Price: 10.99}
+	dish2 := Dish{Name: "Burger", Price: 5.99}
+
+	order.AddDish(dish1)
+	order.AddDish(dish2)
+
+	order.CalculateTotal()
+	if order.Total != 16.98 {
+		t.Errorf("Expected total of 16.98, got %.2f", order.Total)
+	}
+
+	order.RemoveDish(dish1)
+
+	order.CalculateTotal()
+	if order.Total != 5.99 {
+		t.Errorf("Expected total of 5.99, got %.2f", order.Total)
+	}
+}
+
+func TestMergeMaps(t *testing.T) {
+	map1 := map[string]int{"a": 1, "b": 2}
+	map2 := map[string]int{"c": 3, "d": 4}
+	expected := map[string]int{"a": 1, "b": 2, "c": 3, "d": 4}
+
+	mergedMap := mergeMaps(map1, map2)
+
+	if !reflect.DeepEqual(mergedMap, expected) {
+		t.Errorf("Expected %v but got %v", expected, mergedMap)
+	}
+}
+
+func TestCreateUniqueText(t *testing.T) {
+	input := "the quick brown fox jumps over the lazy dog"
+	expected := "the quick brown fox jumps over lazy dog"
+
+	result := createUniqueText(input)
+
+	if result != expected {
+		t.Errorf("Expected %q but got %q", expected, result)
+	}
+}
+
+func TestFilterSentence(t *testing.T) {
+	sentence := "Lorem ipsum dolor sit amet consectetur adipiscing elit ipsum"
+	filter := map[string]bool{"ipsum": true, "elit": true}
+	expected := "Lorem dolor sit amet consectetur adipiscing"
+
+	result := filterSentence(sentence, filter)
+
+	if result != expected {
+		t.Errorf("Expected %q but got %q", expected, result)
+	}
+}
+
+func TestCountBytes(t *testing.T) {
+	s := "hello"
+	expected := 5
+	result := countBytes(s)
+	if result != expected {
+		t.Errorf("countBytes(%q) = %d; expected %d", s, result, expected)
+	}
+
+	s = "привет"
+	expected = 12
+	result = countBytes(s)
+	if result != expected {
+		t.Errorf("countBytes(%q) = %d; expected %d", s, result, expected)
+	}
+}
+
+func TestCountSymbols(t *testing.T) {
+	s := "hello"
+	expected := 5
+	result := countSymbols(s)
+	if result != expected {
+		t.Errorf("countSymbols(%q) = %d; expected %d", s, result, expected)
+	}
+
+	s = "привет"
+	expected = 6
+	result = countSymbols(s)
+	if result != expected {
+		t.Errorf("countSymbols(%q) = %d; expected %d", s, result, expected)
+	}
+}
+
+func TestReverseString(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "empty string",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "single character string",
+			input:    "a",
+			expected: "a",
+		},
+		{
+			name:     "string with even length",
+			input:    "abcd",
+			expected: "dcba",
+		},
+		{
+			name:     "string with odd length",
+			input:    "abcde",
+			expected: "edcba",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := ReverseStrings(tc.input)
+			if actual != tc.expected {
+				t.Errorf("Expected %q but got %q", tc.expected, actual)
+			}
+		})
+	}
+}
+
+func TestGetType(t *testing.T) {
+	// Тест для пустого интерфейса
+	var i interface{}
+	expected := "Пустой интерфейс"
+	if getType(i) != expected {
+		t.Errorf("getType(%v) = %v, ожидается %v", i, getType(i), expected)
+	}
+
+	// Тест для значения типа int
+	i = 42
+	expected = "Тип: int"
+	if getType(i) != expected {
+		t.Errorf("getType(%v) = %v, ожидается %v", i, getType(i), expected)
+	}
+
+	// Тест для значения типа string
+	i = "hello"
+	expected = "Тип: string"
+	if getType(i) != expected {
+		t.Errorf("getType(%v) = %v, ожидается %v", i, getType(i), expected)
+	}
+
+	// Тест для значения типа bool
+	i = true
+	expected = "Тип: bool"
+	if getType(i) != expected {
+		t.Errorf("getType(%v) = %v, ожидается %v", i, getType(i), expected)
 	}
 }
 

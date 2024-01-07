@@ -10,6 +10,7 @@ require (
 require github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 
 require (
+	github.com/EasyLanding/testMyMath v0.0.0-20240107134341-771a2b5e173e
 	github.com/corpix/uarand v0.0.0-20170723150923-031be390f409 // indirect
 	github.com/mattevans/dinero v0.8.0
 	github.com/mewzax/gocolors v0.0.0-20221019142406-54bd99dc8314

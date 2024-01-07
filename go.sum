@@ -1,3 +1,5 @@
+github.com/EasyLanding/testMyMath v0.0.0-20240107134341-771a2b5e173e h1:nNY0OAAlcPwevfXDL8JdgzQ+/ekg6HqthK3CVromiMI=
+github.com/EasyLanding/testMyMath v0.0.0-20240107134341-771a2b5e173e/go.mod h1:oB+L5MU9+wuFE8LJ74nNq3tBTCbRpMqy2gg56/JT6wI=
 github.com/brianvoe/gofakeit/v6 v6.26.3 h1:3ljYrjPwsUNAUFdUIr2jVg5EhKdcke/ZLop7uVg1Er8=
 github.com/brianvoe/gofakeit/v6 v6.26.3/go.mod h1:Xj58BMSnFqcn/fAQeSK+/PLtC5kSb7FJIq4JyGa8vEs=
 github.com/corpix/uarand v0.0.0-20170723150923-031be390f409 h1:9A+mfQmwzZ6KwUXPc8nHxFtKgn9VIvO3gXAOspIcE3s=

@@ -13,6 +13,7 @@ import (
 
 	"mymath/mymath"
 
+	testmymath "github.com/EasyLanding/testMyMath"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/icrowley/fake"
 	"github.com/mattevans/dinero"
@@ -1067,4 +1068,11 @@ func main() {
 	fmt.Println("Power of", x, "to", y, "is", mymath.MyPow(x, y))
 	fmt.Println("Max of", x, "and", y, "is", mymath.MyMax(x, y))
 	fmt.Println("Min of", x, "and", y, "is", mymath.MyMin(x, y))
+
+	fmt.Println("Square root of", x, "is", testmymath.TestMySqrt(x))
+	fmt.Println("Ceil of", x, "is", testmymath.TestMyCeil(x))
+	fmt.Println("Floor of", x, "is", testmymath.TestMyFloor(x))
+	fmt.Println("Power of", x, "to", y, "is", testmymath.TestMyPow(x, y))
+	fmt.Println("Max of", x, "and", y, "is", testmymath.TestMyMax(x, y))
+	fmt.Println("Min of", x, "and", y, "is", testmymath.TestMyMin(x, y))
 }

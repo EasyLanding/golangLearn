@@ -11,6 +11,8 @@ import (
 	"unicode/utf8"
 	"unsafe"
 
+	"mymath/mymath"
+
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/icrowley/fake"
 	"github.com/mattevans/dinero"
@@ -1056,4 +1058,13 @@ func main() {
 	fmt.Println(getType(k)) // Вывод: "[]int"
 	var l interface{} = interface{}(nil)
 	fmt.Println(getType(l))
+
+	x := 4.0
+	y := 2.0
+	fmt.Println("Square root of", x, "is", mymath.MySqrt(x))
+	fmt.Println("Ceil of", x, "is", mymath.MyCeil(x))
+	fmt.Println("Floor of", x, "is", mymath.MyFloor(x))
+	fmt.Println("Power of", x, "to", y, "is", mymath.MyPow(x, y))
+	fmt.Println("Max of", x, "and", y, "is", mymath.MyMax(x, y))
+	fmt.Println("Min of", x, "and", y, "is", mymath.MyMin(x, y))
 }

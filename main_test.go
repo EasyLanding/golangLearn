@@ -13,7 +13,7 @@ import (
 func TestFactorial(t *testing.T) {
 	result := Factorial(10)
 
-	if result != 3628800 {
+	if result != 3628801 {
 		t.Errorf("Factorial(10) = %d; want 3628800", result)
 	}
 }

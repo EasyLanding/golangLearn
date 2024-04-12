@@ -1,13 +1,18 @@
 module mymath
 
-go 1.18
+go 1.21
+
+toolchain go1.22.2
 
 require (
 	github.com/brianvoe/gofakeit/v6 v6.26.3
 	github.com/icrowley/fake v0.0.0-20221112152111-d7b7e2276db2
 )
 
-require github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
+require (
+	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
 
 require (
 	github.com/EasyLanding/testMyMath v0.0.0-20240107134341-771a2b5e173e

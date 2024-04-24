@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"reflect"
@@ -561,4 +562,31 @@ func equal(a, b interface{}) bool {
 		return true
 	}
 	return false
+}
+func TestGetJSON(t *testing.T) {
+ users := []UserJSON{
+  {Name: "Alice", Age: 25, Comments: []Comment{{Text: "Hello"}, {Text: "World"}}},
+  {Name: "Bob", Age: 30, Comments: []Comment{{Text: "Goodbye"}}},
+ }
+
+ expectedJSON := `[{"name":"Alice","age":25,"comments":[{"text":"Hello"},{"text":"World"}]},{"name":"Bob","age":30,"comments":[{"text":"Goodbye"}]}]`
+
+ jsonData, err := getJSON(users)
+ if err != nil {
+  t.Errorf("Unexpected error: %v", err)
+ }
+
+ if jsonData != expectedJSON {
+  t.Errorf("JSON does not match. Expected: %s, Got: %s", expectedJSON, jsonData)
+ }
+
+ var decodedUsers []UserJSON
+ err = json.Unmarshal([]byte(jsonData), &decodedUsers)
+ if err != nil {
+  t.Errorf("Error decoding JSON: %v", err)
+ }
+
+ if !reflect.DeepEqual(users, decodedUsers) {
+  t.Errorf("Decoded users do not match original users")
+ }
 }

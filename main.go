@@ -13,6 +13,8 @@ import (
 
 	"mymath/mymath"
 
+	"encoding/json"
+
 	testmymath "github.com/EasyLanding/testMyMath"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/icrowley/fake"
@@ -762,6 +764,46 @@ func getType(i interface{}) string {
 	}
 }
 
+type Person struct {
+	Name  string `json:"name"`
+	Age   int    `json:"age"`
+	Email string `json:"email"`
+}
+
+func JsonEncode() []byte {
+	person := Person{
+		Name:  "Иван",
+		Age:   30,
+		Email: "ivan@example.com",
+	}
+
+	jsonData, err := json.Marshal(person)
+	if err != nil {
+		fmt.Println("Ошибка сериализации в JSON:", err)
+		return nil
+	}
+
+	return jsonData
+}
+
+type Comment struct {
+	Text string `json:"text"`
+}
+
+type UserJSON struct {
+	Name     string    `json:"name"`
+	Age      int       `json:"age"`
+	Comments []Comment `json:"comments"`
+}
+
+func getJSON(data []UserJSON) (string, error) {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonData), nil
+}
+
 func main() {
 	fmt.Println(HelloWorld())
 	fmt.Println(SecondString())
@@ -1075,4 +1117,19 @@ func main() {
 	fmt.Println("Power of", x, "to", y, "is", testmymath.TestMyPow(x, y))
 	fmt.Println("Max of", x, "and", y, "is", testmymath.TestMyMax(x, y))
 	fmt.Println("Min of", x, "and", y, "is", testmymath.TestMyMin(x, y))
+
+	resultJsonEncode := JsonEncode()
+	fmt.Println(resultJsonEncode)
+
+	users := []UserJSON{
+		{Name: "Alice", Age: 25, Comments: []Comment{{Text: "Hello"}, {Text: "World"}}},
+		{Name: "Bob", Age: 30, Comments: []Comment{{Text: "Goodbye"}}},
+	}
+
+	jsonData, err := getJSON(users)
+	if err != nil {
+		fmt.Println("Error:", err)
+	} else {
+		fmt.Println(jsonData)
+	}
 }

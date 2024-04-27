@@ -21,6 +21,7 @@ import (
 	"github.com/mattevans/dinero"
 	"github.com/mewzax/gocolors"
 	"github.com/shopspring/decimal"
+	"gopkg.in/yaml.v2"
 )
 
 func HelloWorld() string {
@@ -804,6 +805,49 @@ func getJSON(data []UserJSON) (string, error) {
 	return string(jsonData), nil
 }
 
+type UserJSONWrite struct {
+	Name     string    `json:"name"`
+	Age      int       `json:"age"`
+	Comments []Comment `json:"comments"`
+}
+
+type CommentJSONWrite struct {
+	Text string `json:"text"`
+}
+
+func getUsersFromJSON(data []byte) ([]UserJSONWrite, error) {
+	var users []UserJSONWrite
+	err := json.Unmarshal(data, &users)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+type Config struct {
+	Server Server `yaml:"server"`
+	Db     Db     `yaml:"db"`
+}
+
+type Server struct {
+	Port string `yaml:"port"`
+}
+
+type Db struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+}
+
+func getYAML(configs []Config) (string, error) {
+	yamlData, err := yaml.Marshal(configs)
+	if err != nil {
+		return "", err
+	}
+	return string(yamlData), nil
+}
+
 func main() {
 	fmt.Println(HelloWorld())
 	fmt.Println(SecondString())
@@ -1132,4 +1176,59 @@ func main() {
 	} else {
 		fmt.Println(jsonData)
 	}
+
+	jsonDataByte := []byte(`[
+  {
+   "name": "John",
+   "age": 30,
+   "comments": [
+    {"text": "Great post!"},
+    {"text": "I agree"}
+   ]
+  },
+  {
+   "name": "Alice",
+   "age": 25,
+   "comments": [
+    {"text": "Nice article"}
+   ]
+  }
+ ]`)
+	usersJSON, err := getUsersFromJSON(jsonDataByte)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	for _, user := range usersJSON {
+		fmt.Println("Name:", user.Name)
+		fmt.Println("Age:", user.Age)
+		fmt.Println("Comments:")
+		for _, comment := range user.Comments {
+			fmt.Println("- ", comment.Text)
+		}
+		fmt.Println()
+	}
+
+	configs := []Config{
+		{
+			Server: Server{
+				Port: "8080",
+			},
+			Db: Db{
+				Host:     "localhost",
+				Port:     "5432",
+				User:     "admin",
+				Password: "password123",
+			},
+		},
+	}
+
+	yamlString, err := getYAML(configs)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	fmt.Println(yamlString)
 }

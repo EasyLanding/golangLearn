@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -848,6 +850,101 @@ func getYAML(configs []Config) (string, error) {
 	return string(yamlData), nil
 }
 
+type ConfigYm struct {
+	Server Server `yaml:"server"`
+	Db     Db     `yaml:"db"`
+}
+
+type ServerYm struct {
+	Port string `yaml:"port"`
+}
+
+type DbYm struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+}
+
+func getConfigFromYAML(data []byte) (ConfigYm, error) {
+	var config ConfigYm
+	err := yaml.Unmarshal(data, &config)
+	if err != nil {
+		return ConfigYm{}, err
+	}
+	return config, nil
+}
+
+type UserWriteYaml struct {
+	Name     string             `yaml:"name"`
+	Age      int                `yaml:"age"`
+	Comments []CommentWriteYaml `yaml:"comments"`
+}
+
+type CommentWriteYaml struct {
+	Text string `yaml:"text"`
+}
+
+func writeYAML(filePath string, data []UserWriteYaml) error {
+	// Создаем директорию, если она не существует
+	err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	// Преобразуем данные в формат YAML
+	yamlData, err := yaml.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	// Записываем данные в файл
+	err = os.WriteFile(filePath, yamlData, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func writeYAML2(filePath string, data interface{}) error {
+	// Преобразуем данные в формат YAML
+	yamlData, err := yaml.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	// Создаем директорию, если она не существует
+	dir := filepath.Dir(filePath)
+	err = os.MkdirAll(dir, 0755)
+	if err != nil {
+		return err
+	}
+
+	// Создаем файл и записываем в него данные в формате YAML
+	err = os.WriteFile(filePath, yamlData, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func unmarshal(data []byte, v interface{}) error {
+	if err := json.Unmarshal(data, v); err != nil {
+		// Попробуем декодировать данные как YAML
+		if err := yaml.Unmarshal(data, v); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+type PersonUnmarshal struct {
+	Name string `json:"name" yaml:"name"`
+	Age  int    `json:"age" yaml:"age"`
+}
+
 func main() {
 	fmt.Println(HelloWorld())
 	fmt.Println(SecondString())
@@ -1231,4 +1328,81 @@ func main() {
 	}
 
 	fmt.Println(yamlString)
+
+	yamlFile, err := os.ReadFile("config.yaml")
+	if err != nil {
+		fmt.Printf("Ошибка при чтении файла YAML: %v\n", err)
+		return
+	}
+
+	config, err := getConfigFromYAML(yamlFile)
+	if err != nil {
+		fmt.Printf("Ошибка при разборе YAML: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Server Port: %s\n", config.Server.Port)
+	fmt.Printf("DB Host: %s\n", config.Db.Host)
+	fmt.Printf("DB Port: %s\n", config.Db.Port)
+	fmt.Printf("DB User: %s\n", config.Db.User)
+	fmt.Printf("DB Password: %s\n", config.Db.Password)
+
+	usersWriteYaml := []UserWriteYaml{
+		{
+			Name: "Alice",
+			Age:  25,
+			Comments: []CommentWriteYaml{
+				{Text: "Comment 1"},
+				{Text: "Comment 2"},
+			},
+		},
+		{
+			Name: "Bob",
+			Age:  30,
+			Comments: []CommentWriteYaml{
+				{Text: "Comment 3"},
+			},
+		},
+	}
+
+	filePath := "data.yaml"
+	errWriteYaml := writeYAML(filePath, usersWriteYaml)
+	if errWriteYaml != nil {
+		fmt.Println("Error writing YAML:", errWriteYaml)
+		return
+	}
+	fmt.Println("Data written to", filePath)
+
+	person := Person{Name: "Alice", Age: 30}
+	errYaml2 := writeYAML2("output.yaml", person)
+	if errYaml2 != nil {
+		fmt.Println("Ошибка при записи данных в файл:", errYaml2)
+	} else {
+		fmt.Println("Данные успешно записаны в файл output.yaml")
+	}
+
+	dataUnmarshal := []byte(`{"name":"John","age":30}`)
+	var personUnmarshal PersonUnmarshal
+	errUnmarshal := unmarshal(dataUnmarshal, &personUnmarshal)
+	if errUnmarshal != nil {
+		fmt.Println("Ошибка декодирования данных:", errUnmarshal)
+		return
+	}
+	fmt.Println("Имя:", personUnmarshal.Name)
+	fmt.Println("Возраст:", personUnmarshal.Age)
+
+	data, err := os.ReadFile("test_data.json")
+    if err != nil {
+        fmt.Println("Error reading file:", err)
+        return
+    }
+    err = unmarshal(data, &personUnmarshal)
+    if err != nil {
+        fmt.Println("Error unmarshalling data:", err)
+        return
+    }
+
+    // Вывод полученных данных
+    fmt.Printf("Name: %s\n", personUnmarshal.Name)
+    fmt.Printf("Age: %d\n", personUnmarshal.Age)
 }

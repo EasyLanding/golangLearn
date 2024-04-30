@@ -1,0 +1,9 @@
+- name: Alice
+  age: 25
+  comments:
+  - text: Comment 1
+  - text: Comment 2
+- name: Bob
+  age: 30
+  comments:
+  - text: Comment 3

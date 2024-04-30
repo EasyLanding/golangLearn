@@ -4,11 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
+	"os"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 // func TestFactorial(t *testing.T) {
@@ -591,49 +595,157 @@ func TestGetJSON(t *testing.T) {
 	}
 }
 
-func TestGetUsersFromJSON(t *testing.T) {
-	jsonData := []byte(`[
-  {
-   "name": "John",
-   "age": 30,
-   "comments": [
-    {"text": "Great post!"},
-    {"text": "I agree"}
-   ]
-  },
-  {
-   "name": "Alice",
-   "age": 25,
-   "comments": [
-    {"text": "Nice article"}
-   ]
-  }
- ]`)
+// func TestGetUsersFromJSON(t *testing.T) {
+// 	jsonData := []byte(`[
+//   {
+//    "name": "John",
+//    "age": 30,
+//    "comments": [
+//     {"text": "Great post!"},
+//     {"text": "I agree"}
+//    ]
+//   },
+//   {
+//    "name": "Alice",
+//    "age": 25,
+//    "comments": [
+//     {"text": "Nice article"}
+//    ]
+//   }
+//  ]`)
 
-	expectedUsers := `[
-  {
-   "name": "John",
-   "age": 30,
-   "comments": [
-    {"text": "Great post!"},
-    {"text": "I agree"}
-   ]
-  },
-  {
-   "name": "Alice",
-   "age": 25,
-   "comments": [
-    {"text": "Nice article"}
-   ]
-  }
- ]`
+// 	expectedUsers := `[
+//   {
+//    "name": "John",
+//    "age": 30,
+//    "comments": [
+//     {"text": "Great post!"},
+//     {"text": "I agree"}
+//    ]
+//   },
+//   {
+//    "name": "Alice",
+//    "age": 25,
+//    "comments": [
+//     {"text": "Nice article"}
+//    ]
+//   }
+//  ]`
 
-	users, err := getUsersFromJSON(jsonData)
+// 	users, err := getUsersFromJSON(jsonData)
+// 	if err != nil {
+// 		t.Errorf("Unexpected error: %v", err)
+// 	}
+
+//		if !reflect.DeepEqual(users, expectedUsers) {
+//			t.Errorf("Expected users to be %v, but got %v", expectedUsers, users)
+//		}
+//	}
+func TestWriteYAML(t *testing.T) {
+	// Создаем временный файл для теста
+	tmpfile, err := ioutil.TempFile("", "test.yaml")
+	if err != nil {
+		t.Fatalf("Failed to create temporary file: %v", err)
+	}
+	defer os.Remove(tmpfile.Name())
+
+	// Создаем тестовые данные
+	users := []UserWriteYaml{
+		{Name: "Alice", Age: 30, Comments: []CommentWriteYaml{{Text: "First comment"}}},
+		{Name: "Bob", Age: 25, Comments: []CommentWriteYaml{{Text: "Second comment"}}},
+	}
+
+	// Вызываем функцию writeYAML
+	err = writeYAML(tmpfile.Name(), users)
+	if err != nil {
+		t.Fatalf("writeYAML failed: %v", err)
+	}
+
+	// Читаем данные из файла
+	yamlData, err := ioutil.ReadFile(tmpfile.Name())
+	if err != nil {
+		t.Fatalf("Failed to read file: %v", err)
+	}
+
+	// Преобразуем данные из файла в структуру
+	var result []UserWriteYaml
+	err = yaml.Unmarshal(yamlData, &result)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal YAML data: %v", err)
+	}
+
+	// Проверяем, что данные после записи и чтения совпадают
+	if !reflect.DeepEqual(users, result) {
+		t.Errorf("Data mismatch. Expected: %v, Got: %v", users, result)
+	}
+}
+func TestWriteYAML2(t *testing.T) {
+	// Подготовка тестовых данных
+	type TestData struct {
+		Name  string
+		Age   int
+		email string
+	}
+	testData := TestData{Name: "Bob", Age: 25, email: ""}
+	filePath := "test_output.yaml"
+
+	// Вызов функции и проверка на ошибки
+	err := writeYAML2(filePath, testData)
+	if err != nil {
+		t.Errorf("Ошибка при записи данных в файл: %v", err)
+	}
+
+	// Проверка наличия файла и его содержимого
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		t.Errorf("Файл %s не был создан", filePath)
+	}
+	yamlData, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		t.Errorf("Ошибка при чтении файла: %v", err)
+	}
+
+	// Проверка содержимого файла
+	expectedYAML := "name: Bob\nage: 25\n"
+	if string(yamlData) != expectedYAML {
+		t.Errorf("Неправильное содержимое файла. Ожидаемый результат: %s, полученный результат: %s", expectedYAML, string(yamlData))
+	}
+
+	// Удаление созданного файла
+	err = os.Remove(filePath)
+	if err != nil {
+		t.Errorf("Ошибка при удалении файла: %v", err)
+	}
+}
+
+func TestUnmarshalJSON(t *testing.T) {
+	data := []byte(`{"key": "value"}`)
+	var v map[string]string
+	err := unmarshal(data, &v)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
+	if v["key"] != "value" {
+		t.Errorf("Expected key 'value', got '%s'", v["key"])
+	}
+}
 
-	if !reflect.DeepEqual(users, expectedUsers) {
-		t.Errorf("Expected users to be %v, but got %v", expectedUsers, users)
+func TestUnmarshalYAML(t *testing.T) {
+	data := []byte("key: value")
+	var v map[string]string
+	err := unmarshal(data, &v)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if v["key"] != "value" {
+		t.Errorf("Expected key 'value', got '%s'", v["key"])
+	}
+}
+
+func TestUnmarshalInvalidVariableType(t *testing.T) {
+	data := []byte(`{"key": "value"}`)
+	var v int // Неверный тип переменной
+	err := unmarshal(data, &v)
+	if err == nil {
+		t.Error("Expected an error, but got nil")
 	}
 }

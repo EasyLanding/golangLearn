@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -945,6 +946,17 @@ type PersonUnmarshal struct {
 	Age  int    `json:"age" yaml:"age"`
 }
 
+func writeToFile(file *os.File, data string) error {
+	_, err := file.WriteString(data)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	return nil
+}
+
 func main() {
 	fmt.Println(HelloWorld())
 	fmt.Println(SecondString())
@@ -1392,17 +1404,31 @@ func main() {
 	fmt.Println("Возраст:", personUnmarshal.Age)
 
 	data, err := os.ReadFile("test_data.json")
-    if err != nil {
-        fmt.Println("Error reading file:", err)
-        return
-    }
-    err = unmarshal(data, &personUnmarshal)
-    if err != nil {
-        fmt.Println("Error unmarshalling data:", err)
-        return
-    }
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+		return
+	}
+	err = unmarshal(data, &personUnmarshal)
+	if err != nil {
+		fmt.Println("Error unmarshalling data:", err)
+		return
+	}
 
-    // Вывод полученных данных
-    fmt.Printf("Name: %s\n", personUnmarshal.Name)
-    fmt.Printf("Age: %d\n", personUnmarshal.Age)
+	// Вывод полученных данных
+	fmt.Printf("Name: %s\n", personUnmarshal.Name)
+	fmt.Printf("Age: %d\n", personUnmarshal.Age)
+
+	file, err := os.Create("output.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	dataHello := "Hello, World!"
+	err = writeToFile(file, dataHello)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Data has been written to the file.")
 }

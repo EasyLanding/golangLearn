@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -747,5 +748,33 @@ func TestUnmarshalInvalidVariableType(t *testing.T) {
 	err := unmarshal(data, &v)
 	if err == nil {
 		t.Error("Expected an error, but got nil")
+	}
+}
+
+func write1ToFile(file io.Writer, data string) error {
+	_, err := file.Write([]byte(data))
+	return err
+}
+
+type fakeFile struct {
+	bytes.Buffer
+}
+
+func (f *fakeFile) Close() error {
+	return nil
+}
+
+func TestWriteToFile(t *testing.T) {
+	file := &fakeFile{}
+
+	data := "Test data"
+	err := write1ToFile(file, data)
+	if err != nil {
+		t.Errorf("writeToFile returned an error: %v", err)
+	}
+
+	expected := "Test data"
+	if file.String() != expected {
+		t.Errorf("writeToFile did not write the correct data. Expected: %s, Got: %s", expected, file.String())
 	}
 }

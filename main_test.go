@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -777,4 +778,26 @@ func TestWriteToFile(t *testing.T) {
 	if file.String() != expected {
 		t.Errorf("writeToFile did not write the correct data. Expected: %s, Got: %s", expected, file.String())
 	}
+}
+
+func TestContextWithDeadline(t *testing.T) {
+	t.Run("Context deadline exceeded", func(t *testing.T) {
+		ctx := context.Background()
+		contextDeadline := 1 * time.Second
+		timeAfter := 2 * time.Second
+		result := contextWithDeadline(ctx, contextDeadline, timeAfter)
+		if result != "context deadline exceeded" {
+			t.Errorf("Expected 'context deadline exceeded', but got %s", result)
+		}
+	})
+
+	t.Run("Time after exceeded", func(t *testing.T) {
+		ctx := context.Background()
+		contextDeadline := 2 * time.Second
+		timeAfter := 1 * time.Second
+		result := contextWithDeadline(ctx, contextDeadline, timeAfter)
+		if result != "time after exceeded" {
+			t.Errorf("Expected 'time after exceeded', but got %s", result)
+		}
+	})
 }

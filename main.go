@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -1431,4 +1432,60 @@ func main() {
 	}
 
 	log.Println("Data has been written to the file.")
+
+	aTest, bTest := 8, 13
+	fmt.Println(*testDefer(&aTest, &bTest))
+
+	var resContext string
+	resContext = contextWithDeadline(context.Background(), 1*time.Second, 2*time.Second)
+	println(resContext)
+	resContext = contextWithDeadline(context.Background(), 2*time.Second, 1*time.Second)
+	println(resContext)
+
+	var resContextWithTimeout string
+	resContextWithTimeout = contextWithTimeout(context.Background(), 1*time.Second, 2*time.Second)
+	fmt.Println(resContextWithTimeout)
+	resContextWithTimeout = contextWithTimeout(context.Background(), 2*time.Second, 1*time.Second)
+	fmt.Println(resContextWithTimeout)
+}
+
+func testDefer(a, b *int) *int {
+	var c int
+	defer func() {
+		c = multiply(*a, *b)
+	}()
+	c = sum(*a, *b)
+	return &c
+}
+
+func sum(a, b int) int {
+	return a + b
+}
+
+func multiply(a, b int) int {
+	return a * b
+}
+
+func contextWithDeadline(ctx context.Context, contextDeadline time.Duration, timeAfter time.Duration) string {
+	ctxWithDeadline, cancel := context.WithTimeout(ctx, contextDeadline)
+	defer cancel()
+
+	select {
+	case <-ctxWithDeadline.Done():
+		return "context deadline exceeded"
+	case <-time.After(timeAfter):
+		return "time after exceeded"
+	}
+}
+
+func contextWithTimeout(ctx context.Context, contextTimeout time.Duration, timeAfter time.Duration) string {
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, contextTimeout)
+	defer cancel()
+
+	select {
+	case <-ctxWithTimeout.Done():
+		return "превышено время ожидания контекста"
+	case <-time.After(timeAfter):
+		return "превышено время ожидания"
+	}
 }
